@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uydu Avcısı - OSINT Turk</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <!-- Leaflet Draw CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
+    
+    <!-- Leaflet Control Geocoder CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+
+    <!-- JotForm Custom Widget SDK -->
+    <script src="https://js.jotform.com/JotFormCustomWidget.min.js"></script>
+
+    <!-- JSZip & FileSaver for Client-side KMZ Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+
+    <div class="container">
+        <div class="sidebar">
+            <h1>Uydu Avcısı</h1>
+            <p>Harita üzerinde bir alan seçin ve uydu tipini belirleyin.</p>
+            
+            <div class="form-group">
+                <label for="date-select">Tarih Seçimi:</label>
+                <input type="date" id="date-select" class="form-control">
+            </div>
+            
+            <div class="info-box" id="coordinates-info">
+                <p>Henüz bir alan seçilmedi.</p>
+            </div>
+            
+            <button id="generate-btn" disabled>KMZ Oluştur</button>
+            
+            <div id="result-area" style="display:none; margin-top: 20px;">
+                <a id="download-link" href="#" class="download-btn">KMZ İndir</a>
+            </div>
+        </div>
+        
+        <div id="map" style="height: 100vh; width: 100%; background-color: #e0e0e0;">
+            <div style="padding: 20px; text-align: center;">Harita Yükleniyor... (Lütfen Bekleyin)</div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- Esri Leaflet -->
+    <script src="https://unpkg.com/esri-leaflet@3.0.10/dist/esri-leaflet.js"></script>
+
+    <!-- Leaflet Draw JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    
+    <!-- Leaflet Control Geocoder JS -->
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+    <script src="static/script.js"></script>
+</body>
+</html>

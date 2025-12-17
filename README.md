@@ -1,26 +1,33 @@
-# Uydu Avcısı
+# Uydu Avcısı (Satellite Hunter)
 
-Bu proje, OpenStreetMap üzerinde bir alan seçerek, seçilen alan için belirtilen uydu tipine göre KMZ dosyası oluşturan web tabanlı bir araçtır.
+Bu proje, OSINT Turk için geliştirilmiş, harita üzerinden alan seçimi ve uydu görüntüsü tarihi sorgulama aracıdır. Tamamen **istemci taraflı (client-side)** çalışır, yani sunucu gerektirmez.
 
-## Kurulum
+## Özellikler
+- **Alan Seçimi:** Harita üzerinde poligon çizerek alan belirleme.
+- **Uydu/Harita Modu:** Sokak haritası ve uydu görüntüleri arasında geçiş.
+- **Tarih Sorgulama:** Uydu modunda haritaya tıklayarak o bölgenin görüntü tarihini öğrenme.
+- **KMZ Oluşturma:** Seçilen alan ve tarih bilgisiyle Google Earth (KMZ) dosyası oluşturma.
+- **JotForm Entegrasyonu:** Seçilen verileri JotForm widget'ı olarak forma aktarma.
 
-1. Gerekli Python kütüphanelerini yükleyin:
-   ```bash
-   pip install -r requirements.txt
-   ```
+## Kurulum ve Yayınlama (Deployment)
 
-## Çalıştırma
+Bu proje statik bir web sitesidir (`HTML`, `CSS`, `JS`). Çalıştırmak için herhangi bir Python veya PHP sunucusuna ihtiyaç duymaz.
 
-1. Uygulamayı başlatın:
-   ```bash
-   python app.py
-   ```
+### Seçenek 1: GitHub Pages (Önerilen)
+1. Bu klasörü bir GitHub deposuna (repository) yükleyin.
+2. Depo ayarlarından (Settings) -> **Pages** sekmesine gidin.
+3. **Source** olarak `main` branch'ini seçin ve kaydedin.
+4. Size verilen `https://kullaniciadi.github.io/repo-adi` linkini kullanın.
 
-2. Tarayıcınızda `http://127.0.0.1:5000` adresine gidin.
+### Seçenek 2: Netlify
+1. [Netlify Drop](https://app.netlify.com/drop) adresine gidin.
+2. `uydu_avcisi` klasörünü sürükleyip sayfaya bırakın.
+3. Saniyeler içinde size `https://random-name.netlify.app` gibi bir link verecektir.
 
-## Kullanım
+## Yerel Çalıştırma
+Bilgisayarınızda test etmek için `index.html` dosyasını bir tarayıcıda açmanız yeterlidir. Ancak bazı tarayıcı güvenlik kısıtlamaları nedeniyle, bir yerel sunucu kullanmanız daha sağlıklı olur:
 
-1. Harita üzerindeki çizim araçlarını (çokgen veya dikdörtgen) kullanarak bir alan belirleyin.
-2. Sol panelden uydu tipini seçin (Maxar 50cm, Maxar 30cm, Airbus Pleiades 50cm).
-3. "KMZ Oluştur" butonuna tıklayın.
-4. Oluşturulan KMZ dosyasını indirin.
+```bash
+python3 -m http.server 8000
+```
+Ardından tarayıcıda `http://localhost:8000` adresine gidin.

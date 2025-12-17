@@ -21,7 +21,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
-    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="static/style.css?v=2">
 </head>
 <body>
 
@@ -47,9 +47,36 @@
         </div>
         
         <div id="map" style="height: 100vh; width: 100%; background-color: #e0e0e0;">
-            <div style="padding: 20px; text-align: center;">Harita Yükleniyor... (Lütfen Bekleyin)</div>
+            <div id="loading-message" style="padding: 20px; text-align: center;">
+                <h3>Harita Yükleniyor...</h3>
+                <p>Lütfen Bekleyin.</p>
+                <p id="debug-info" style="font-size: 12px; color: #666; margin-top: 20px;"></p>
+            </div>
         </div>
     </div>
+
+    <!-- Error Handling Script -->
+    <script>
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            var debugInfo = document.getElementById('debug-info');
+            if (debugInfo) {
+                debugInfo.innerHTML += "Hata: " + msg + "<br>Dosya: " + url + "<br>Satır: " + lineNo + "<br><br>";
+                debugInfo.style.color = 'red';
+            }
+            return false;
+        };
+
+        setTimeout(function() {
+            var mapDiv = document.getElementById('map');
+            // If map hasn't initialized (leaflet adds classes), show warning
+            if (mapDiv && !mapDiv.classList.contains('leaflet-container')) {
+                var debugInfo = document.getElementById('debug-info');
+                if (debugInfo) {
+                    debugInfo.innerHTML += "Zaman aşımı: Harita 5 saniye içinde yüklenemedi.<br>Script dosyası yüklenmemiş veya çalışmamış olabilir.<br>";
+                }
+            }
+        }, 5000);
+    </script>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -63,6 +90,6 @@
     <!-- Leaflet Control Geocoder JS -->
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
-    <script src="static/script.js"></script>
+    <script src="static/script.js?v=2"></script>
 </body>
 </html>

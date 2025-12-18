@@ -370,12 +370,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 value: ""
             };
             
-            // Eğer bir alan seçilmişse ve veri varsa onu gönder
-            var startDate = document.getElementById('start-date').value;
-            var endDate = document.getElementById('end-date').value;
+            // Tarih verilerini al (Hem yeni hem eski yapıyı destekle)
+            var startDateInput = document.getElementById('start-date');
+            var endDateInput = document.getElementById('end-date');
+            var oldDateInput = document.getElementById('date-select');
 
-            if (currentAreaText && startDate && endDate && currentLayer) {
-                var dateRange = startDate + " - " + endDate;
+            var startDate = startDateInput ? startDateInput.value : "";
+            var endDate = endDateInput ? endDateInput.value : "";
+            var oldDate = oldDateInput ? oldDateInput.value : "";
+
+            // Eğer eski yapı varsa ve doluysa, onu kullan
+            if (!startDate && oldDate) {
+                startDate = oldDate;
+                endDate = oldDate; // Bitiş de aynı olsun
+            }
+
+            // Kontrol: Alan seçili mi ve en az bir tarih var mı?
+            if (currentAreaText && startDate && currentLayer) {
+                var dateRange = (startDate === endDate) ? startDate : (startDate + " - " + endDate);
                 
                 // Koordinatları tekrar alalım
                 var latlngs = currentLayer.getLatLngs()[0];
@@ -398,7 +410,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Placemark>
     <name>Uydu Avcısı Alanı</name>
-    <description>Tarih Aralığı: ${dateRange}, Alan: ${currentAreaText}</description>
+    <description>Tarih: ${dateRange}, Alan: ${currentAreaText}</description>
     <Polygon>
       <outerBoundaryIs>
         <LinearRing>
@@ -425,7 +437,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         "2. SEÇİM DETAYLARI": {
                             "Tarih Aralığı": dateRange,
                             "Başlangıç": startDate,
-                            "Bitiş": endDate,
+                            "Bitiş": endDate || startDate,
                             "Alan Büyüklüğü": currentAreaText
                         },
                         "3. KONUM VERİLERİ": {
@@ -437,16 +449,29 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     };
                     
-                    // Eski düz formatı da koruyalım (programatik erişim için gerekirse diye, ama ana çıktı bu olacak)
-                    // JotForm genellikle bu JSON'ı string olarak saklar.
-                    
-                    msg.value = JSON.stringify(readableOutput, null, 4); // 4 boşluklu girinti ile formatla
+                    msg.value = JSON.stringify(readableOutput, null, 4);
                     logScript("SUBMIT Olayı: Veri gönderiliyor (Okunaklı Format).");
+                    JFCustomWidget.sendSubmit(msg);
+                }).catch(function(err) {
+                    console.error("KMZ oluşturma hatası:", err);
+                    // Hata olsa bile en azından metin verilerini gönderelim
+                    var fallbackOutput = {
+                        "HATA": "KMZ dosyası oluşturulamadı.",
+                        "Detay": err.message,
+                        "Tarih": dateRange,
+                        "Alan": currentAreaText,
+                        "Koordinatlar": coordinates
+                    };
+                    msg.value = JSON.stringify(fallbackOutput, null, 4);
                     JFCustomWidget.sendSubmit(msg);
                 });
 
             } else {
                 logScript("SUBMIT Olayı: Veri yok veya eksik (Alan/Tarih seçilmedi).");
+                // Kullanıcıya uyarı verip gönderimi engelleyelim mi? 
+                // JotForm'da valid: false dönersek form gönderilmez.
+                msg.valid = false;
+                msg.message = "Lütfen harita üzerinde bir alan seçin ve tarih girin.";
                 JFCustomWidget.sendSubmit(msg);
             }
         });

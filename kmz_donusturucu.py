@@ -19,14 +19,28 @@ def save_kmz():
         b64_string = ""
 
         # 1. Durum: Kullanıcı tüm JSON verisini yapıştırdıysa
-        if "{" in user_input and "kmzBase64" in user_input:
+        if "{" in user_input:
             try:
                 data = json.loads(user_input)
-                if 'kmzBase64' in data:
+                
+                # Yeni Yapı (Gruplandırılmış)
+                if "4. DOSYA VERİSİ" in data:
+                    b64_string = data["4. DOSYA VERİSİ"].get("KMZ Dosyası (Base64)", "")
+                
+                # Eski Yapı (Düz)
+                elif 'kmzBase64' in data:
                     b64_string = data['kmzBase64']
-                elif 'value' in data: # Bazen value içinde string olarak gelir
-                    inner_data = json.loads(data['value'])
-                    b64_string = inner_data.get('kmzBase64', '')
+                
+                # JotForm Value İçinde String Olarak
+                elif 'value' in data: 
+                    try:
+                        inner_data = json.loads(data['value'])
+                        if "4. DOSYA VERİSİ" in inner_data:
+                            b64_string = inner_data["4. DOSYA VERİSİ"].get("KMZ Dosyası (Base64)", "")
+                        else:
+                            b64_string = inner_data.get('kmzBase64', '')
+                    except:
+                        pass
             except:
                 # JSON parse edilemediyse belki string içinde geçiyordur
                 pass

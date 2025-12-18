@@ -1,55 +1,42 @@
 // Global variable to store area text
 var currentAreaText = '';
 
-// Debug helper
-function logScript(msg) {
-    var d = document.getElementById('debug-info');
-    if(d) d.innerHTML += "[Script.js] " + msg + "<br>";
-    console.log("[Script.js] " + msg);
-}
-
-logScript("Dosya yüklendi ve çalışıyor.");
-
 // Remove loading text first
 document.addEventListener('DOMContentLoaded', function() {
-    logScript("DOMContentLoaded tetiklendi.");
+    console.log("Script loaded and DOM ready");
     
     var mapContainer = document.getElementById('map');
     if (mapContainer) {
-        logScript("Map container bulundu.");
         mapContainer.innerHTML = ''; // Clear loading message
         
         // Fallback: If container has no height, force it
         if (mapContainer.clientHeight === 0) {
             mapContainer.style.height = '100vh'; // Force vh instead of %
-            logScript("Yükseklik 0 tespit edildi, 100vh zorlandı.");
+            console.log("Yükseklik 0 tespit edildi, 100vh zorlandı.");
         }
     } else {
-        logScript("HATA: Map container bulunamadı!");
         console.error("Map container not found!");
         return;
     }
 
     // Check Leaflet
     if (typeof L === 'undefined') {
-        logScript("HATA: Leaflet (L) tanımlı değil! Kütüphane yüklenmemiş.");
+        console.error("HATA: Leaflet (L) tanımlı değil! Kütüphane yüklenmemiş.");
         return;
     }
 
     // Initialize map
     try {
-        logScript("Harita başlatılıyor...");
         var map = L.map('map', {
             zoomControl: true,
             attributionControl: true
         }).setView([39.9334, 32.8597], 6); // Default center: Turkey
         
-        logScript("Harita nesnesi oluşturuldu.");
+        console.log("Harita nesnesi oluşturuldu.");
         
         // Make map global so other functions can use it if needed
         window.map = map; 
     } catch (e) {
-        logScript("HATA: Harita başlatılamadı: " + e.message);
         console.error("Map initialization failed:", e);
         alert("Harita yüklenirken hata oluştu: " + e.message);
         return;
@@ -59,7 +46,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function forceResize() {
         if (window.map) {
             window.map.invalidateSize();
-            logScript("Harita boyutu güncellendi (invalidateSize).");
         }
     }
     setTimeout(forceResize, 100);
@@ -73,7 +59,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!fixedOnce && window.map) {
             window.map.invalidateSize();
             fixedOnce = true;
-            logScript("Mouse hareketi ile harita düzeltildi.");
         }
     });
 
@@ -99,20 +84,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add default layer
     osmLayer.addTo(map);
-
-    // Tile Debugging
-    map.on('tileloadstart', function(e) {
-        // logScript("Tile yükleniyor: " + e.tile.src); // Çok fazla log oluşturabilir, sadece gerekirse açın
-    });
-    
-    map.on('tileload', function(e) {
-        console.log("Tile yüklendi");
-    });
-    
-    map.on('tileerror', function(e) {
-        logScript("<span style='color:red'>Tile Yükleme Hatası:</span> " + e.error.message);
-        console.error("Tile error:", e);
-    });
 
     // Layer Control
     var baseMaps = {

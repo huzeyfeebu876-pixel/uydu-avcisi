@@ -416,20 +416,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 zip.file("doc.kml", kmlContent);
 
                 zip.generateAsync({type:"base64"}).then(function(base64) {
-                    var widgetData = {
-                        info: "Bu veri Uydu Avcısı tarafından oluşturulmuştur.",
-                        date: dateRange,
-                        startDate: startDate,
-                        endDate: endDate,
-                        area: currentAreaText,
-                        coordinates: coordinates,
-                        googleMapsLink: `https://www.google.com/maps?q=${coordinates[0][0]},${coordinates[0][1]}`,
-                        kmzBase64: base64, // KMZ verisi eklendi
-                        generatedAt: new Date().toISOString()
+                    // Daha okunaklı bir yapı oluştur
+                    var readableOutput = {
+                        "1. GENEL BİLGİLER": {
+                            "Bilgi": "Bu veri Uydu Avcısı tarafından oluşturulmuştur.",
+                            "Oluşturulma Zamanı": new Date().toISOString()
+                        },
+                        "2. SEÇİM DETAYLARI": {
+                            "Tarih Aralığı": dateRange,
+                            "Başlangıç": startDate,
+                            "Bitiş": endDate,
+                            "Alan Büyüklüğü": currentAreaText
+                        },
+                        "3. KONUM VERİLERİ": {
+                            "Google Maps Linki": `https://www.google.com/maps?q=${coordinates[0][0]},${coordinates[0][1]}`,
+                            "Koordinat Listesi": coordinates
+                        },
+                        "4. DOSYA VERİSİ": {
+                            "KMZ Dosyası (Base64)": base64
+                        }
                     };
                     
-                    msg.value = JSON.stringify(widgetData);
-                    logScript("SUBMIT Olayı: Veri gönderiliyor (KMZ dahil).");
+                    // Eski düz formatı da koruyalım (programatik erişim için gerekirse diye, ama ana çıktı bu olacak)
+                    // JotForm genellikle bu JSON'ı string olarak saklar.
+                    
+                    msg.value = JSON.stringify(readableOutput, null, 4); // 4 boşluklu girinti ile formatla
+                    logScript("SUBMIT Olayı: Veri gönderiliyor (Okunaklı Format).");
                     JFCustomWidget.sendSubmit(msg);
                 });
 

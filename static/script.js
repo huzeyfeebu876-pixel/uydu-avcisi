@@ -86,6 +86,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add default layer
     osmLayer.addTo(map);
 
+    // Tile Debugging
+    map.on('tileloadstart', function(e) {
+        // logScript("Tile yükleniyor: " + e.tile.src); // Çok fazla log oluşturabilir, sadece gerekirse açın
+    });
+    
+    map.on('tileload', function(e) {
+        console.log("Tile yüklendi");
+    });
+    
+    map.on('tileerror', function(e) {
+        logScript("<span style='color:red'>Tile Yükleme Hatası:</span> " + e.error.message);
+        console.error("Tile error:", e);
+    });
+
     // Layer Control
     var baseMaps = {
         "Harita": osmLayer,

@@ -317,76 +317,32 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Client-side KMZ Generation
-        var kmlContent = `<?xml version="1.0" encoding="UTF-8"?>
-    <kml xmlns="http://www.opengis.net/kml/2.2">
-      <Document>
-        <name>Uydu Avcısı - ${date}</name>
-        <Style id="polyStyle">
-          <LineStyle>
-            <color>ff0000ff</color>
-            <width>3</width>
-          </LineStyle>
-          <PolyStyle>
-            <color>320000ff</color>
-          </PolyStyle>
-        </Style>
-        <Placemark>
-          <name>Target Area - ${date}</name>
-          <description>Target Date: ${date}\nArea: ${currentAreaText}\nGenerated: ${new Date().toISOString()}</description>
-          <styleUrl>#polyStyle</styleUrl>
-          <Polygon>
-            <outerBoundaryIs>
-              <LinearRing>
-                <coordinates>
-                  ${coordinates.map(c => `${c[0]},${c[1]},0`).join(' ')}
-                </coordinates>
-              </LinearRing>
-            </outerBoundaryIs>
-          </Polygon>
-        </Placemark>
-      </Document>
-    </kml>`;
+        // JotForm Entegrasyonu: Veriyi form alanına kaydet
+        var widgetData = {
+            coordinates: coordinates,
+            date: date,
+            area: currentAreaText,
+            info: "Kullanıcı tarafından seçilen alan ve tarih."
+        };
 
-        var zip = new JSZip();
-        zip.file("doc.kml", kmlContent);
+        // Veriyi JSON string olarak gönder (JotForm tek bir değer bekler)
+        var finalData = JSON.stringify(widgetData);
         
-        zip.generateAsync({type:"blob"})
-        .then(function(content) {
-            var filename = `uydu_avcisi_${date.replace(/-/g, '')}_${new Date().getTime()}.kmz`;
-            saveAs(content, filename);
-
-            // Show download link (optional, since we auto-saved)
-            var resultArea = document.getElementById('result-area');
-            var downloadLink = document.getElementById('download-link');
-            
-            // Create a blob URL for the link
-            var url = URL.createObjectURL(content);
-            downloadLink.href = url;
-            downloadLink.download = filename;
-            downloadLink.innerText = "KMZ İndirildi (Tekrar İndir)";
-            resultArea.style.display = 'block';
-
-            // JotForm Entegrasyonu: Veriyi form alanına kaydet
-            // Not: Client-side olduğu için kalıcı bir URL veremiyoruz, ancak koordinatları verebiliriz.
-            var widgetData = {
-                filename: filename,
-                coordinates: coordinates,
-                date: date,
-                area: currentAreaText
-            };
-
-            // Veriyi JSON string olarak gönder (JotForm tek bir değer bekler)
-            var finalData = JSON.stringify(widgetData);
+        if (window.JFCustomWidget) {
             JFCustomWidget.sendData({ value: finalData });
             console.log("JotForm'a veri gönderildi:", finalData);
+        }
 
-            // Ayrıca postMessage ile de gönderelim (alternatif kullanım için)
-            window.parent.postMessage({
-                message: 'kmz_generated',
-                ...widgetData
-            }, '*');
-        });
+        // Ayrıca postMessage ile de gönderelim (alternatif kullanım için)
+        window.parent.postMessage({
+            message: 'data_generated',
+            ...widgetData
+        }, '*');
+
+        // Kullanıcıya bilgi ver
+        var resultArea = document.getElementById('result-area');
+        resultArea.innerHTML = '<strong>✓ Başarılı:</strong> Seçilen alan ve tarih bilgisi forma aktarıldı.<br>Formu gönderebilirsiniz.';
+        resultArea.style.display = 'block';
     });
 
     // JotForm Widget Başlatma ve Olay Dinleyicileri

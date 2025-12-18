@@ -377,7 +377,9 @@ document.addEventListener('DOMContentLoaded', function() {
             };
 
             // Veriyi JSON string olarak gönder (JotForm tek bir değer bekler)
-            JFCustomWidget.sendData({ value: JSON.stringify(widgetData) });
+            var finalData = JSON.stringify(widgetData);
+            JFCustomWidget.sendData({ value: finalData });
+            console.log("JotForm'a veri gönderildi:", finalData);
 
             // Ayrıca postMessage ile de gönderelim (alternatif kullanım için)
             window.parent.postMessage({
@@ -387,10 +389,33 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // JotForm Widget Başlatma
+    // JotForm Widget Başlatma ve Olay Dinleyicileri
     if (window.JFCustomWidget) {
-        JFCustomWidget.subscribe("ready", function(){
-            console.log("JotForm Widget Ready");
+        JFCustomWidget.subscribe("ready", function(msg){
+            console.log("JotForm Widget Hazır:", msg);
+            // Eğer widget ayarları varsa buradan okuyabiliriz
+            // var settings = msg.settings;
+        });
+
+        JFCustomWidget.subscribe("submit", function(){
+            var msg = {
+                valid: true,
+                value: ""
+            };
+            
+            // Eğer bir alan seçilmişse ve veri varsa onu gönder
+            if (currentAreaText && document.getElementById('date-select').value) {
+                var date = document.getElementById('date-select').value;
+                var widgetData = {
+                    info: "Bu veri Uydu Avcısı tarafından oluşturulmuştur.",
+                    date: date,
+                    area: currentAreaText,
+                    generatedAt: new Date().toISOString()
+                };
+                msg.value = JSON.stringify(widgetData);
+            }
+            
+            JFCustomWidget.sendSubmit(msg);
         });
     }
 });

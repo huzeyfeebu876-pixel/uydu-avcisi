@@ -366,24 +366,61 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Koordinatları tekrar alalım
                 var latlngs = currentLayer.getLatLngs()[0];
                 var coordinates = latlngs.map(function(ll) {
-                    return [ll.lat, ll.lng]; // Google Maps formatı (Lat, Lng) daha kullanışlı olabilir
+                    return [ll.lat, ll.lng]; // Google Maps formatı (Lat, Lng)
                 });
 
-                var widgetData = {
-                    info: "Bu veri Uydu Avcısı tarafından oluşturulmuştur.",
-                    date: date,
-                    area: currentAreaText,
-                    coordinates: coordinates, // Koordinatları ekledik
-                    googleMapsLink: `https://www.google.com/maps?q=${coordinates[0][0]},${coordinates[0][1]}`, // İlk noktaya link
-                    generatedAt: new Date().toISOString()
-                };
-                msg.value = JSON.stringify(widgetData);
-                logScript("SUBMIT Olayı: Veri gönderiliyor: " + msg.value);
+                // KML için koordinatları hazırla (Lng, Lat formatında ve döngü kapalı)
+                var kmlCoordinates = "";
+                latlngs.forEach(function(ll) {
+                    kmlCoordinates += `${ll.lng},${ll.lat},0 `;
+                });
+                // Poligonu kapat
+                if (latlngs.length > 0) {
+                    kmlCoordinates += `${latlngs[0].lng},${latlngs[0].lat},0`;
+                }
+
+                // KML İçeriğini Oluştur
+                var kmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Placemark>
+    <name>Uydu Avcısı Alanı</name>
+    <description>Tarih: ${date}, Alan: ${currentAreaText}</description>
+    <Polygon>
+      <outerBoundaryIs>
+        <LinearRing>
+          <coordinates>
+            ${kmlCoordinates}
+          </coordinates>
+        </LinearRing>
+      </outerBoundaryIs>
+    </Polygon>
+  </Placemark>
+</kml>`;
+
+                // KMZ Oluştur (JSZip ile)
+                var zip = new JSZip();
+                zip.file("doc.kml", kmlContent);
+
+                zip.generateAsync({type:"base64"}).then(function(base64) {
+                    var widgetData = {
+                        info: "Bu veri Uydu Avcısı tarafından oluşturulmuştur.",
+                        date: date,
+                        area: currentAreaText,
+                        coordinates: coordinates,
+                        googleMapsLink: `https://www.google.com/maps?q=${coordinates[0][0]},${coordinates[0][1]}`,
+                        kmzBase64: base64, // KMZ verisi eklendi
+                        generatedAt: new Date().toISOString()
+                    };
+                    
+                    msg.value = JSON.stringify(widgetData);
+                    logScript("SUBMIT Olayı: Veri gönderiliyor (KMZ dahil).");
+                    JFCustomWidget.sendSubmit(msg);
+                });
+
             } else {
                 logScript("SUBMIT Olayı: Veri yok veya eksik (Alan/Tarih seçilmedi).");
+                JFCustomWidget.sendSubmit(msg);
             }
-            
-            JFCustomWidget.sendSubmit(msg);
         });
     }
 });

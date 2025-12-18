@@ -360,12 +360,21 @@ document.addEventListener('DOMContentLoaded', function() {
             };
             
             // Eğer bir alan seçilmişse ve veri varsa onu gönder
-            if (currentAreaText && document.getElementById('date-select').value) {
+            if (currentAreaText && document.getElementById('date-select').value && currentLayer) {
                 var date = document.getElementById('date-select').value;
+                
+                // Koordinatları tekrar alalım
+                var latlngs = currentLayer.getLatLngs()[0];
+                var coordinates = latlngs.map(function(ll) {
+                    return [ll.lat, ll.lng]; // Google Maps formatı (Lat, Lng) daha kullanışlı olabilir
+                });
+
                 var widgetData = {
                     info: "Bu veri Uydu Avcısı tarafından oluşturulmuştur.",
                     date: date,
                     area: currentAreaText,
+                    coordinates: coordinates, // Koordinatları ekledik
+                    googleMapsLink: `https://www.google.com/maps?q=${coordinates[0][0]},${coordinates[0][1]}`, // İlk noktaya link
                     generatedAt: new Date().toISOString()
                 };
                 msg.value = JSON.stringify(widgetData);

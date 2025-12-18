@@ -50,30 +50,38 @@
             <div id="loading-message" style="padding: 20px; text-align: center;">
                 <h3>Harita Yükleniyor...</h3>
                 <p>Lütfen Bekleyin.</p>
-                <p id="debug-info" style="font-size: 12px; color: #666; margin-top: 20px;"></p>
             </div>
         </div>
+    </div>
+    
+    <!-- Debug Info Area (Outside Map) -->
+    <div id="debug-container" style="position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.9); border-top: 1px solid #ccc; padding: 10px; z-index: 9999; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;">
+        <strong>Debug Log:</strong><br>
+        <span id="debug-info"></span>
     </div>
 
     <!-- Error Handling Script -->
     <script>
+        function logDebug(msg) {
+            var d = document.getElementById('debug-info');
+            if(d) d.innerHTML += msg + "<br>";
+            console.log(msg);
+        }
+
         window.onerror = function(msg, url, lineNo, columnNo, error) {
-            var debugInfo = document.getElementById('debug-info');
-            if (debugInfo) {
-                debugInfo.innerHTML += "Hata: " + msg + "<br>Dosya: " + url + "<br>Satır: " + lineNo + "<br><br>";
-                debugInfo.style.color = 'red';
-            }
+            logDebug("<span style='color:red'>Hata: " + msg + " (" + url + ":" + lineNo + ")</span>");
             return false;
         };
 
+        logDebug("Sayfa yüklendi. Kontroller başlıyor...");
+
         setTimeout(function() {
             var mapDiv = document.getElementById('map');
-            // If map hasn't initialized (leaflet adds classes), show warning
             if (mapDiv && !mapDiv.classList.contains('leaflet-container')) {
-                var debugInfo = document.getElementById('debug-info');
-                if (debugInfo) {
-                    debugInfo.innerHTML += "Zaman aşımı: Harita 5 saniye içinde yüklenemedi.<br>Script dosyası yüklenmemiş veya çalışmamış olabilir.<br>";
-                }
+                logDebug("<span style='color:red'>Zaman aşımı: Harita 5 saniye içinde yüklenemedi.</span>");
+                logDebug("Olası sebepler: script.js yüklenmedi, Leaflet yüklenmedi veya kod çalışırken hata oluştu.");
+            } else {
+                logDebug("<span style='color:green'>Harita container sınıfı algılandı.</span>");
             }
         }, 5000);
     </script>

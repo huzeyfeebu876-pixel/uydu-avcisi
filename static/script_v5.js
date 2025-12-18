@@ -378,6 +378,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     generatedAt: new Date().toISOString()
                 };
                 msg.value = JSON.stringify(widgetData);
+                logScript("SUBMIT Olayı: Veri gönderiliyor: " + msg.value);
+            } else {
+                logScript("SUBMIT Olayı: Veri yok veya eksik (Alan/Tarih seçilmedi).");
             }
             
             JFCustomWidget.sendSubmit(msg);

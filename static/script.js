@@ -295,11 +295,20 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('generate-btn').addEventListener('click', function() {
         if (!currentLayer) return;
 
-        var date = document.getElementById('date-select').value;
-        if (!date) {
-            alert("Lütfen bir tarih seçiniz.");
+        var startDate = document.getElementById('start-date').value;
+        var endDate = document.getElementById('end-date').value;
+
+        if (!startDate || !endDate) {
+            alert("Lütfen başlangıç ve bitiş tarihlerini seçiniz.");
             return;
         }
+
+        if (startDate > endDate) {
+            alert("Başlangıç tarihi bitiş tarihinden sonra olamaz.");
+            return;
+        }
+
+        var dateRange = startDate + " - " + endDate;
         
         // Extract coordinates in [lng, lat] format for KML
         // Leaflet uses [lat, lng]
@@ -320,9 +329,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // JotForm Entegrasyonu: Veriyi form alanına kaydet
         var widgetData = {
             coordinates: coordinates,
-            date: date,
+            date: dateRange,
+            startDate: startDate,
+            endDate: endDate,
             area: currentAreaText,
-            info: "Kullanıcı tarafından seçilen alan ve tarih."
+            info: "Kullanıcı tarafından seçilen alan ve tarih aralığı."
         };
 
         // Veriyi JSON string olarak gönder (JotForm tek bir değer bekler)
@@ -360,8 +371,11 @@ document.addEventListener('DOMContentLoaded', function() {
             };
             
             // Eğer bir alan seçilmişse ve veri varsa onu gönder
-            if (currentAreaText && document.getElementById('date-select').value && currentLayer) {
-                var date = document.getElementById('date-select').value;
+            var startDate = document.getElementById('start-date').value;
+            var endDate = document.getElementById('end-date').value;
+
+            if (currentAreaText && startDate && endDate && currentLayer) {
+                var dateRange = startDate + " - " + endDate;
                 
                 // Koordinatları tekrar alalım
                 var latlngs = currentLayer.getLatLngs()[0];
@@ -384,7 +398,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Placemark>
     <name>Uydu Avcısı Alanı</name>
-    <description>Tarih: ${date}, Alan: ${currentAreaText}</description>
+    <description>Tarih Aralığı: ${dateRange}, Alan: ${currentAreaText}</description>
     <Polygon>
       <outerBoundaryIs>
         <LinearRing>
@@ -404,7 +418,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 zip.generateAsync({type:"base64"}).then(function(base64) {
                     var widgetData = {
                         info: "Bu veri Uydu Avcısı tarafından oluşturulmuştur.",
-                        date: date,
+                        date: dateRange,
+                        startDate: startDate,
+                        endDate: endDate,
                         area: currentAreaText,
                         coordinates: coordinates,
                         googleMapsLink: `https://www.google.com/maps?q=${coordinates[0][0]},${coordinates[0][1]}`,

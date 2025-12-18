@@ -31,8 +31,17 @@
             <p>Harita üzerinde bir alan seçin ve uydu tipini belirleyin.</p>
             
             <div class="form-group">
-                <label for="date-select">Tarih Seçimi:</label>
-                <input type="date" id="date-select" class="form-control">
+                <label>Tarih Aralığı:</label>
+                <div style="display: flex; gap: 5px;">
+                    <div style="flex: 1;">
+                        <label for="start-date" style="font-size: 0.8em; margin-bottom: 2px; display: block;">Başlangıç:</label>
+                        <input type="date" id="start-date" class="form-control" style="font-size: 0.9em;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="end-date" style="font-size: 0.8em; margin-bottom: 2px; display: block;">Bitiş:</label>
+                        <input type="date" id="end-date" class="form-control" style="font-size: 0.9em;">
+                    </div>
+                </div>
             </div>
             
             <div class="info-box" id="coordinates-info">

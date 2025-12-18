@@ -57,11 +57,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Force resize multiple times to ensure rendering in iframe
     function forceResize() {
-        if (window.map) window.map.invalidateSize();
+        if (window.map) {
+            window.map.invalidateSize();
+            logScript("Harita boyutu güncellendi (invalidateSize).");
+        }
     }
     setTimeout(forceResize, 100);
     setTimeout(forceResize, 500);
-    setTimeout(forceResize, 2000);
+    setTimeout(forceResize, 1000);
+    setTimeout(forceResize, 3000);
+
+    // Mouse over fix: When user hovers map, fix it once
+    var fixedOnce = false;
+    document.getElementById('map').addEventListener('mousemove', function() {
+        if (!fixedOnce && window.map) {
+            window.map.invalidateSize();
+            fixedOnce = true;
+            logScript("Mouse hareketi ile harita düzeltildi.");
+        }
+    });
 
     // Extra fix for iframe resizing
     window.addEventListener("resize", function() {
